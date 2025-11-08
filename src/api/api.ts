@@ -23,11 +23,15 @@ export async function generateInterview(data: FormData) {
   })
 }
 
+import { textToSpeech } from './tts'
+
 export async function getVoice(questionText: string) {
-  // TODO: POST to /api/voice with text to convert to speech using ElevenLabs
-  return new Promise<{ audioUrl: string }>((resolve) => {
-    setTimeout(() => resolve({ audioUrl: 'https://example.com/fake-audio.mp3' }), 500)
-  })
+  // Use the client-side ElevenLabs TTS helper. This will return a local object URL you can play with <audio>.
+  // Note: If the ElevenLabs API enforces CORS, you may need a backend proxy. See README notes.
+  const blob = await textToSpeech(questionText)
+  if (!blob) throw new Error('getVoice: failed to generate audio')
+  const audioUrl = URL.createObjectURL(blob)
+  return { audioUrl }
 }
 
 export async function transcribeVoice(audioBlob: Blob) {
